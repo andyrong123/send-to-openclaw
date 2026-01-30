@@ -70,12 +70,31 @@ function extractPageContent() {
     const host = location.hostname;
     const url = location.href;
 
-    // X / Twitter — extract tweet thread, strip sidebar and nav chrome
+    // X / Twitter — extract tweet thread or article, strip sidebar and nav chrome
     if (host === "x.com" || host === "twitter.com" || host === "mobile.x.com" || host === "mobile.twitter.com") {
+      // Check for X article (long-form post)
+      const articleBody = document.querySelector('div[data-testid="blogPost"]')
+        || document.querySelector('article div[class*="article"]')
+        || document.querySelector('[data-testid="tweet"] div[lang]');
+
+      // Try grabbing the primary content column, stripping sidebars
+      const primaryColumn = document.querySelector('div[data-testid="primaryColumn"]');
+
+      if (primaryColumn) {
+        // Clone and strip noise from primary column only
+        const clone = primaryColumn.cloneNode(true);
+        // Remove trending, who to follow, live events, etc.
+        clone.querySelectorAll('[data-testid="sidebarColumn"], [role="complementary"], a[href="/explore"], [data-testid="trend"], [data-testid="UserCell"]').forEach(n => n.remove());
+        // Remove interactive elements
+        clone.querySelectorAll('button, input, textarea, svg, [role="button"], [data-testid="toolBar"], [data-testid="replyButton"], [data-testid="retweetButton"], [data-testid="likeButton"], [data-testid="shareButton"]').forEach(n => n.remove());
+
+        const text = clone.innerText.trim();
+        if (text.length > 50) return text;
+      }
+
+      // Fallback: extract individual tweets from thread
       const tweets = [];
-      // Primary tweet (the one in the URL)
       const primaryArticle = document.querySelector('article[data-testid="tweet"][tabindex="-1"]');
-      // All tweet articles in the thread
       const articles = document.querySelectorAll('article[data-testid="tweet"]');
       const seen = new Set();
 

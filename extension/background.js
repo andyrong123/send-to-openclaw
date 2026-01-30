@@ -42,11 +42,24 @@ async function fetchGoogleDocText(tabId, docId) {
 function extractPageContent() {
   const selection = window.getSelection ? window.getSelection().toString().trim() : "";
 
-  // X / Twitter — extract tweet thread, strip sidebar and nav chrome
+  // X / Twitter — extract tweet thread or article, strip sidebar and nav chrome
   function tryTwitter() {
     const host = location.hostname;
     if (host !== "x.com" && host !== "twitter.com" && host !== "mobile.x.com" && host !== "mobile.twitter.com") return null;
 
+    // Try grabbing the primary content column, stripping sidebars
+    const primaryColumn = document.querySelector('div[data-testid="primaryColumn"]');
+
+    if (primaryColumn) {
+      const clone = primaryColumn.cloneNode(true);
+      clone.querySelectorAll('[data-testid="sidebarColumn"], [role="complementary"], a[href="/explore"], [data-testid="trend"], [data-testid="UserCell"]').forEach(n => n.remove());
+      clone.querySelectorAll('button, input, textarea, svg, [role="button"], [data-testid="toolBar"], [data-testid="replyButton"], [data-testid="retweetButton"], [data-testid="likeButton"], [data-testid="shareButton"]').forEach(n => n.remove());
+
+      const text = clone.innerText.trim();
+      if (text.length > 50) return text;
+    }
+
+    // Fallback: extract individual tweets from thread
     const tweets = [];
     const primaryArticle = document.querySelector('article[data-testid="tweet"][tabindex="-1"]');
     const articles = document.querySelectorAll('article[data-testid="tweet"]');
