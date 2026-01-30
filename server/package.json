@@ -1,7 +1,7 @@
 {
-  "name": "send-to-clawdbot-server",
+  "name": "send-to-openclaw-server",
   "version": "1.0.0",
-  "description": "Webhook server for Send to Clawdbot extension.",
+  "description": "Webhook server for Send to OpenClaw extension.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

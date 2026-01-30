@@ -1,0 +1,13 @@
+[Unit]
+Description=Send to OpenClaw webhook server
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/send-to-openclaw/server
+EnvironmentFile=/opt/send-to-openclaw/server/.env
+ExecStart=/usr/bin/node /opt/send-to-openclaw/server/server.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

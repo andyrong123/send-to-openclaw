@@ -39,7 +39,7 @@ function formatWakeText(payload) {
   return lines.filter((line) => line !== "").join("\n");
 }
 
-app.post("/send-to-clawdbot", (req, res) => {
+app.post("/send-to-openclaw", (req, res) => {
   if (!isAuthorized(req)) {
     return res.status(401).json({ ok: false, error: "Unauthorized" });
   }
@@ -61,7 +61,7 @@ app.post("/send-to-clawdbot", (req, res) => {
     timestamp
   });
 
-  const args = ["gateway", "wake", "--text", wakeText, "--mode", CLAWDBOT_WAKE_MODE];
+  const args = ["system", "event", "--text", wakeText, "--mode", CLAWDBOT_WAKE_MODE];
   const child = spawn("clawdbot", args, { stdio: "ignore" });
 
   child.on("error", (error) => {
@@ -82,5 +82,5 @@ app.get("/health", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Send to Clawdbot server listening on ${PORT}`);
+  console.log(`Send to OpenClaw server listening on ${PORT}`);
 });

@@ -1,4 +1,4 @@
-const MENU_ID = "send-to-clawdbot";
+const MENU_ID = "send-to-openclaw";
 
 function cleanWhitespace(text) {
   return text.replace(/\s+/g, " ").trim();
@@ -122,7 +122,7 @@ async function sendPayload(tabId, selectionOverride) {
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: MENU_ID,
-    title: "Send to Clawdbot",
+    title: "Send to OpenClaw",
     contexts: ["page", "selection"]
   });
 });

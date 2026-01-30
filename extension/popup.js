@@ -155,7 +155,7 @@ async function sendToWebhook() {
       throw new Error(`HTTP ${res.status}`);
     }
 
-    setStatus("Sent to Clawdbot.", "ok");
+    setStatus("Sent to OpenClaw.", "ok");
     messageEl.value = "";
   } catch (error) {
     setStatus("Failed to send. Check webhook URL/token.", "error");

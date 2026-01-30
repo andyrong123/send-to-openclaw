@@ -1,7 +1,7 @@
-# Send to Clawdbot — Chrome Extension + Webhook Server
+# Send to OpenClaw — Chrome Extension + Webhook Server
 
 ## Overview
-A Chrome extension that grabs readable content from any web page and sends it to a Clawdbot instance via a configurable webhook. Includes a lightweight webhook server that receives the content and triggers a Clawdbot wake event.
+A Chrome extension that grabs readable content from any web page and sends it to a OpenClaw instance via a configurable webhook. Includes a lightweight webhook server that receives the content and triggers a OpenClaw wake event.
 
 Designed to be open source — no hardcoded URLs, tokens, or personal info anywhere.
 
@@ -10,14 +10,14 @@ Designed to be open source — no hardcoded URLs, tokens, or personal info anywh
 ### Features
 1. **Toolbar button** — click to send the full page content
 2. **Selection support** — if text is highlighted, send only the selection instead of full page
-3. **Context menu** — right-click "Send to Clawdbot" option (works on selection or full page)
+3. **Context menu** — right-click "Send to OpenClaw" option (works on selection or full page)
 4. **Message input** — popup with a text field where the user can type additional context/instructions before sending (e.g., "summarize this" or "save this to the AFA project")
 5. **Page metadata** — always include: page URL, page title, timestamp
 6. **Clean extraction** — strip nav, ads, footers. Use a Readability-style approach to get the article/document body text. For simple pages, document.body.innerText is fine as fallback.
 7. **Status feedback** — show success/error state in the popup after sending
 
 ### Configuration (extension options page)
-- **Webhook URL** — the URL to POST to (e.g., http://100.x.x.x:3847/send-to-clawdbot)
+- **Webhook URL** — the URL to POST to (e.g., http://100.x.x.x:3847/send-to-openclaw)
 - **Auth token** — optional bearer token for the webhook
 - Save settings in chrome.storage.sync
 
@@ -30,7 +30,7 @@ Designed to be open source — no hardcoded URLs, tokens, or personal info anywh
 
 ### Simple Express.js server
 
-**Endpoint:** `POST /send-to-clawdbot`
+**Endpoint:** `POST /send-to-openclaw`
 
 **Request body (JSON):**
 ```json
@@ -46,7 +46,7 @@ Designed to be open source — no hardcoded URLs, tokens, or personal info anywh
 
 **Auth:** Optional bearer token check (configurable via env var `WEBHOOK_TOKEN`)
 
-**Action:** Runs `clawdbot gateway wake` with the content formatted as a message:
+**Action:** Runs `openclaw gateway wake` with the content formatted as a message:
 ```
 📎 Page sent from browser: {title}
 URL: {url}
@@ -56,14 +56,14 @@ URL: {url}
 {selection || content}
 ```
 
-The wake text should be formatted so Clawdbot treats it as a user-initiated share.
+The wake text should be formatted so OpenClaw treats it as a user-initiated share.
 
 **Response:** 200 OK with `{ "ok": true }` or appropriate error.
 
 ### Configuration (env vars)
 - `PORT` — default 3847
 - `WEBHOOK_TOKEN` — optional auth token
-- `CLAWDBOT_WAKE_MODE` — "now" (default) or "next-heartbeat"
+- `OPENCLAW_WAKE_MODE` — "now" (default) or "next-heartbeat"
 
 ### Running
 - `node server.js` or `npm start`
@@ -71,7 +71,7 @@ The wake text should be formatted so Clawdbot treats it as a user-initiated shar
 
 ## File Structure
 ```
-send-to-clawdbot/
+send-to-openclaw/
 ├── extension/
 │   ├── manifest.json
 │   ├── popup.html
@@ -98,7 +98,7 @@ send-to-clawdbot/
 - What it does (screenshot-friendly description)
 - Quick start: install extension + run server
 - Configuration steps
-- How to set up with Clawdbot
+- How to set up with OpenClaw
 - How to use (toolbar button, selection, context menu, message field)
 - No personal info — all config is via the options page and env vars
 

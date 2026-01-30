@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Send to Clawdbot",
+  "name": "Send to OpenClaw",
   "version": "1.0.0",
-  "description": "Send readable page content to a Clawdbot webhook.",
+  "description": "Send readable page content to a OpenClaw webhook.",
   "permissions": ["activeTab", "storage", "contextMenus", "scripting"],
   "action": {
-    "default_title": "Send to Clawdbot",
+    "default_title": "Send to OpenClaw",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",

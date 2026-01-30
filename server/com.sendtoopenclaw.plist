@@ -7,15 +7,15 @@
   <key>ProgramArguments</key>
   <array>
     <string>/usr/local/bin/node</string>
-    <string>/opt/send-to-clawdbot/server/server.js</string>
+    <string>/opt/send-to-openclaw/server/server.js</string>
   </array>
   <key>WorkingDirectory</key>
-  <string>/opt/send-to-clawdbot/server</string>
+  <string>/opt/send-to-openclaw/server</string>
   <key>EnvironmentVariables</key>
   <dict>
     <key>PORT</key>
     <string>3847</string>
-    <key>CLAWDBOT_WAKE_MODE</key>
+    <key>OPENCLAW_WAKE_MODE</key>
     <string>now</string>
   </dict>
   <key>RunAtLoad</key>
