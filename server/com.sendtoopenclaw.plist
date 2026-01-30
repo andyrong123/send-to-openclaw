@@ -3,24 +3,30 @@
 <plist version="1.0">
 <dict>
   <key>Label</key>
-  <string>com.sendtoclwdbot</string>
+  <string>com.sendtoopenclaw</string>
   <key>ProgramArguments</key>
   <array>
-    <string>/usr/local/bin/node</string>
-    <string>/opt/send-to-openclaw/server/server.js</string>
+    <string>/opt/homebrew/bin/node</string>
+    <string>/Users/nat/send-to-openclaw/server/server.js</string>
   </array>
   <key>WorkingDirectory</key>
-  <string>/opt/send-to-openclaw/server</string>
+  <string>/Users/nat/send-to-openclaw/server</string>
   <key>EnvironmentVariables</key>
   <dict>
     <key>PORT</key>
     <string>3847</string>
-    <key>OPENCLAW_WAKE_MODE</key>
+    <key>CLAWDBOT_WAKE_MODE</key>
     <string>now</string>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
   </dict>
   <key>RunAtLoad</key>
   <true/>
   <key>KeepAlive</key>
   <true/>
+  <key>StandardOutPath</key>
+  <string>/Users/nat/send-to-openclaw/server/stdout.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/nat/send-to-openclaw/server/stderr.log</string>
 </dict>
 </plist>

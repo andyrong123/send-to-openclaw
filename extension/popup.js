@@ -31,6 +31,37 @@ function cleanWhitespace(text) {
 function extractPageContent() {
   const selection = window.getSelection ? window.getSelection().toString().trim() : "";
 
+  // Google Docs special handling
+  function tryGoogleDocs() {
+    const host = location.hostname;
+    if (host === "docs.google.com") {
+      // Google Docs renders content in .kix-appview-editor or similar containers
+      const editor = document.querySelector(".kix-appview-editor");
+      if (editor) return editor.innerText.trim();
+      // Fallback: try the script tag with document content
+      const scripts = document.querySelectorAll("script");
+      for (const s of scripts) {
+        if (s.textContent.includes("DOCS_modelChunk")) {
+          const match = s.textContent.match(/"s":"((?:[^"\\]|\\.)*)"/g);
+          if (match) {
+            return match.map(m => m.slice(4, -1).replace(/\\n/g, "\n").replace(/\\t/g, "\t").replace(/\\\\/g, "\\").replace(/\\"/g, '"')).join("");
+          }
+        }
+      }
+      // Last resort: get all text from the page body editing area
+      const pages = document.querySelectorAll(".kix-page");
+      if (pages.length) {
+        return Array.from(pages).map(p => p.innerText.trim()).join("\n\n");
+      }
+    }
+    // Granola, Notion, and other SPA special handling
+    if (host === "notes.granola.ai" || host === "www.notion.so") {
+      const main = document.querySelector("main, [role='main'], article");
+      if (main) return main.innerText.trim();
+    }
+    return null;
+  }
+
   function removeNoise(root) {
     const selectors = [
       "script",
@@ -87,11 +118,16 @@ function extractPageContent() {
     return root.innerText || "";
   }
 
-  const clone = document.body ? document.body.cloneNode(true) : document.documentElement.cloneNode(true);
-  removeNoise(clone);
-  let content = pickBestText(clone);
-  if (!content && document.body) {
-    content = document.body.innerText || "";
+  // Try special handlers first (Google Docs, Granola, Notion, etc.)
+  let content = tryGoogleDocs();
+
+  if (!content) {
+    const clone = document.body ? document.body.cloneNode(true) : document.documentElement.cloneNode(true);
+    removeNoise(clone);
+    content = pickBestText(clone);
+    if (!content && document.body) {
+      content = document.body.innerText || "";
+    }
   }
 
   return {
