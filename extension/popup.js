@@ -31,29 +31,35 @@ function cleanWhitespace(text) {
 function extractPageContent() {
   const selection = window.getSelection ? window.getSelection().toString().trim() : "";
 
-  // Google Docs special handling
-  function tryGoogleDocs() {
+  // Special handling for tricky sites
+  function trySiteSpecific() {
     const host = location.hostname;
-    if (host === "docs.google.com") {
-      // Google Docs renders content in .kix-appview-editor or similar containers
-      const editor = document.querySelector(".kix-appview-editor");
-      if (editor) return editor.innerText.trim();
-      // Fallback: try the script tag with document content
-      const scripts = document.querySelectorAll("script");
-      for (const s of scripts) {
-        if (s.textContent.includes("DOCS_modelChunk")) {
-          const match = s.textContent.match(/"s":"((?:[^"\\]|\\.)*)"/g);
-          if (match) {
-            return match.map(m => m.slice(4, -1).replace(/\\n/g, "\n").replace(/\\t/g, "\t").replace(/\\\\/g, "\\").replace(/\\"/g, '"')).join("");
-          }
-        }
+    const url = location.href;
+
+    // Google Docs — canvas-based rendering, DOM has no content
+    // Auto select-all and grab the selection
+    if (host === "docs.google.com" && url.includes("/document/")) {
+      // Try to get text via accessibility elements
+      const accessibilityContent = document.querySelector('[role="textbox"]');
+      if (accessibilityContent) {
+        const text = accessibilityContent.innerText || accessibilityContent.textContent;
+        if (text && text.trim().length > 10) return text.trim();
       }
-      // Last resort: get all text from the page body editing area
-      const pages = document.querySelectorAll(".kix-page");
-      if (pages.length) {
-        return Array.from(pages).map(p => p.innerText.trim()).join("\n\n");
+      // Try contenteditable areas
+      const editables = document.querySelectorAll('[contenteditable="true"]');
+      for (const el of editables) {
+        const text = el.innerText || el.textContent || "";
+        if (text.trim().length > 10) return text.trim();
       }
+      // Return special flag so popup can prompt user
+      return "__NEEDS_SELECTION__";
     }
+
+    // Google Sheets
+    if (host === "docs.google.com" && url.includes("/spreadsheets/")) {
+      return "__NEEDS_SELECTION__";
+    }
+
     // Granola, Notion, and other SPA special handling
     if (host === "notes.granola.ai" || host === "www.notion.so") {
       const main = document.querySelector("main, [role='main'], article");
@@ -119,7 +125,7 @@ function extractPageContent() {
   }
 
   // Try special handlers first (Google Docs, Granola, Notion, etc.)
-  let content = tryGoogleDocs();
+  let content = trySiteSpecific();
 
   if (!content) {
     const clone = document.body ? document.body.cloneNode(true) : document.documentElement.cloneNode(true);
@@ -163,10 +169,17 @@ async function sendToWebhook() {
       func: extractPageContent
     });
 
+    // If the site needs manual selection (e.g. Google Docs canvas rendering)
+    if (result.content === "__NEEDS_SELECTION__" && !result.selection) {
+      setStatus("This page needs a selection first. Use ⌘A then try again.", "error");
+      sendBtn.disabled = false;
+      return;
+    }
+
     payload = {
       url: result.url,
       title: result.title,
-      content: cleanWhitespace(result.content || ""),
+      content: result.content === "__NEEDS_SELECTION__" ? "" : cleanWhitespace(result.content || ""),
       selection: cleanWhitespace(result.selection || ""),
       message: messageEl.value.trim(),
       timestamp: new Date().toISOString()
