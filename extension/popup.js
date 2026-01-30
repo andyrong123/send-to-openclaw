@@ -169,26 +169,29 @@ async function sendToWebhook() {
       func: extractPageContent
     });
 
-    // If the site needs clipboard (e.g. Google Docs canvas rendering)
-    let clipboardText = "";
-    if (result.content === "__NEEDS_SELECTION__") {
-      try {
-        clipboardText = await navigator.clipboard.readText();
-      } catch (e) {
-        // clipboard empty or denied
-      }
-      if (!clipboardText && !result.selection) {
-        setStatus("Copy text first (⌘C), then hit Send.", "error");
-        sendBtn.disabled = false;
-        return;
-      }
+    // Check for pre-captured selection (from keyboard shortcut)
+    let captured = await new Promise((resolve) => {
+      chrome.storage.local.get(["capturedSelection", "capturedUrl", "capturedTitle"], (data) => {
+        resolve(data);
+      });
+    });
+    // Clear it after reading
+    chrome.storage.local.remove(["capturedSelection", "capturedUrl", "capturedTitle"]);
+
+    const preSelection = (captured && captured.capturedSelection) || "";
+
+    // If the site needs special handling (e.g. Google Docs canvas rendering)
+    if (result.content === "__NEEDS_SELECTION__" && !result.selection && !preSelection) {
+      setStatus("Use ⌥⇧S (Option+Shift+S) with text selected, or copy (⌘C) and paste into the message box.", "error");
+      sendBtn.disabled = false;
+      return;
     }
 
     payload = {
-      url: result.url,
-      title: result.title,
+      url: preSelection ? (captured.capturedUrl || result.url) : result.url,
+      title: preSelection ? (captured.capturedTitle || result.title) : result.title,
       content: result.content === "__NEEDS_SELECTION__" ? "" : cleanWhitespace(result.content || ""),
-      selection: cleanWhitespace(clipboardText || result.selection || ""),
+      selection: cleanWhitespace(preSelection || result.selection || ""),
       message: messageEl.value.trim(),
       timestamp: new Date().toISOString()
     };

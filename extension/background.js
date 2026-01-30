@@ -133,3 +133,39 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
   sendPayload(tab.id, info.selectionText || "").catch(() => {});
 });
+
+// Keyboard shortcut: capture selection while page has focus, then open popup
+chrome.commands.onCommand.addListener(async (command) => {
+  if (command !== "send-selection") return;
+
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (!tab || !tab.id) return;
+
+  // Grab selection NOW while page still has focus
+  try {
+    const [{ result }] = await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: () => {
+        const sel = window.getSelection ? window.getSelection().toString().trim() : "";
+        return {
+          selection: sel,
+          url: location.href,
+          title: document.title || "Untitled"
+        };
+      }
+    });
+
+    // Store the captured selection for the popup to use
+    await chrome.storage.local.set({
+      capturedSelection: result.selection || "",
+      capturedUrl: result.url || "",
+      capturedTitle: result.title || ""
+    });
+
+    // Open the popup
+    chrome.action.openPopup();
+  } catch (e) {
+    // Fallback: just open popup normally
+    chrome.action.openPopup();
+  }
+});
