@@ -42,6 +42,43 @@ async function fetchGoogleDocText(tabId, docId) {
 function extractPageContent() {
   const selection = window.getSelection ? window.getSelection().toString().trim() : "";
 
+  // X / Twitter — extract tweet thread, strip sidebar and nav chrome
+  function tryTwitter() {
+    const host = location.hostname;
+    if (host !== "x.com" && host !== "twitter.com" && host !== "mobile.x.com" && host !== "mobile.twitter.com") return null;
+
+    const tweets = [];
+    const primaryArticle = document.querySelector('article[data-testid="tweet"][tabindex="-1"]');
+    const articles = document.querySelectorAll('article[data-testid="tweet"]');
+    const seen = new Set();
+
+    for (const article of articles) {
+      const userEl = article.querySelector('div[data-testid="User-Name"]');
+      const tweetText = article.querySelector('div[data-testid="tweetText"]');
+      const timeEl = article.querySelector('time');
+
+      const user = userEl ? userEl.innerText.replace(/\n/g, ' ').trim() : '';
+      const text = tweetText ? tweetText.innerText.trim() : '';
+      const time = timeEl ? timeEl.getAttribute('datetime') || timeEl.innerText : '';
+
+      if (!text) continue;
+      const key = user + '|' + text.slice(0, 80);
+      if (seen.has(key)) continue;
+      seen.add(key);
+
+      const isPrimary = article === primaryArticle;
+      let entry = '';
+      if (user) entry += user + '\n';
+      if (time) entry += time + '\n';
+      entry += text;
+      if (isPrimary) entry = '>>> ' + entry.replace(/\n/g, '\n>>> ');
+      tweets.push(entry);
+    }
+
+    if (tweets.length > 0) return tweets.join('\n\n---\n\n');
+    return null;
+  }
+
   function removeNoise(root) {
     const selectors = [
       "script", "style", "noscript", "nav", "footer", "header", "aside",
@@ -71,6 +108,16 @@ function extractPageContent() {
       }
     });
     return bestText || (root.innerText || "");
+  }
+
+  const twitterContent = tryTwitter();
+  if (twitterContent) {
+    return {
+      url: location.href,
+      title: document.title || "Untitled",
+      selection,
+      content: twitterContent
+    };
   }
 
   const clone = document.body ? document.body.cloneNode(true) : document.documentElement.cloneNode(true);

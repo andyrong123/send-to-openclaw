@@ -68,6 +68,43 @@ function extractPageContent() {
 
   function trySiteSpecific() {
     const host = location.hostname;
+    const url = location.href;
+
+    // X / Twitter — extract tweet thread, strip sidebar and nav chrome
+    if (host === "x.com" || host === "twitter.com" || host === "mobile.x.com" || host === "mobile.twitter.com") {
+      const tweets = [];
+      // Primary tweet (the one in the URL)
+      const primaryArticle = document.querySelector('article[data-testid="tweet"][tabindex="-1"]');
+      // All tweet articles in the thread
+      const articles = document.querySelectorAll('article[data-testid="tweet"]');
+      const seen = new Set();
+
+      for (const article of articles) {
+        const userEl = article.querySelector('div[data-testid="User-Name"]');
+        const tweetText = article.querySelector('div[data-testid="tweetText"]');
+        const timeEl = article.querySelector('time');
+
+        const user = userEl ? userEl.innerText.replace(/\n/g, ' ').trim() : '';
+        const text = tweetText ? tweetText.innerText.trim() : '';
+        const time = timeEl ? timeEl.getAttribute('datetime') || timeEl.innerText : '';
+
+        if (!text) continue;
+        const key = user + '|' + text.slice(0, 80);
+        if (seen.has(key)) continue;
+        seen.add(key);
+
+        const isPrimary = article === primaryArticle;
+        let entry = '';
+        if (user) entry += user + '\n';
+        if (time) entry += time + '\n';
+        entry += text;
+        if (isPrimary) entry = '>>> ' + entry.replace(/\n/g, '\n>>> ');
+        tweets.push(entry);
+      }
+
+      if (tweets.length > 0) return tweets.join('\n\n---\n\n');
+    }
+
     if (host === "notes.granola.ai" || host === "www.notion.so") {
       const main = document.querySelector("main, [role='main'], article");
       if (main) return main.innerText.trim();
