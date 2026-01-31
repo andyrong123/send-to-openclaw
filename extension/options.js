@@ -10,11 +10,11 @@ function setStatus(message) {
 
 function loadSettings() {
   chrome.storage.sync.get(["webhookUrl", "authToken", "displayName"], (data) => {
-    webhookInput.value = data.webhookUrl || "";
+    webhookInput.value = data.webhookUrl || "https://polariss-mac-mini-1:4100/webhook/openclaw";
     tokenInput.value = data.authToken || "";
-    displayNameInput.value = data.displayName || "";
+    displayNameInput.value = data.displayName || "Polaris";
 
-    const name = data.displayName || "OpenClaw";
+    const name = data.displayName || "Polaris";
     const heading = document.getElementById("options-title");
     if (heading) heading.textContent = `Send to ${name}`;
     document.title = `Send to ${name} Options`;

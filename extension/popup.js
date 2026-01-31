@@ -12,9 +12,9 @@ function getSettings() {
   return new Promise((resolve) => {
     chrome.storage.sync.get(["webhookUrl", "authToken", "displayName"], (data) => {
       resolve({
-        webhookUrl: data.webhookUrl || "",
+        webhookUrl: data.webhookUrl || "https://polariss-mac-mini-1:4100/webhook/openclaw",
         authToken: data.authToken || "",
-        displayName: data.displayName || "OpenClaw"
+        displayName: data.displayName || "Polaris"
       });
     });
   });
@@ -22,7 +22,7 @@ function getSettings() {
 
 // Load display name into heading on startup
 chrome.storage.sync.get(["displayName"], (data) => {
-  const name = data.displayName || "OpenClaw";
+  const name = data.displayName || "Polaris";
   const heading = document.getElementById("popup-title");
   if (heading) heading.textContent = `Send to ${name}`;
   document.title = `Send to ${name}`;

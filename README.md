@@ -1,78 +1,36 @@
-# Send to OpenClaw 🦞
+# Send to Polaris
 
-A Chrome extension + local webhook server that lets you send any web page (or Google Doc) to your Clawdbot instance with one click.
+Chrome extension to send web page content to Polaris AI assistant.
 
-## What it does
+Forked from [Nateliason/send-to-openclaw](https://github.com/Nateliason/send-to-openclaw).
 
-- **Regular pages**: extracts the main readable text (or your highlighted selection)
-- **Google Docs**: fetches clean plain text via the export API — no auth setup needed, uses your existing Google login
-- **Optional message**: add instructions or context before sending
-- Formats everything and injects it into your Clawdbot session via `clawdbot system event`
+## Installation
 
-## Setup
+1. Open Chrome and go to `chrome://extensions/`
+2. Enable "Developer mode" (top right)
+3. Click "Load unpacked" and select the `extension/` folder
+4. Click the extension icon and go to **Options**
+5. Enter your auth token (get from gateway admin)
 
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/Nateliason/send-to-openclaw.git
-cd send-to-openclaw
-```
-
-### 2. Start the webhook server
-
-```bash
-cd server
-npm install
-cp .env.example .env   # edit if you want to change port or add a token
-npm start
-```
-
-The server listens on `http://localhost:3847/send-to-openclaw` by default.
-
-**Environment variables** (set in `server/.env`):
-| Variable | Default | Description |
-|---|---|---|
-| `PORT` | `3847` | Server port |
-| `WEBHOOK_TOKEN` | _(empty)_ | Optional bearer token for auth |
-| `CLAWDBOT_WAKE_MODE` | `now` | `now` or `next-heartbeat` |
-
-### 3. Load the Chrome extension
-
-1. Open `chrome://extensions`
-2. Enable **Developer mode** (top right)
-3. Click **Load unpacked** → select the `extension/` folder
-4. Click the extension's **Options** and set:
-   - **Webhook URL**: `http://localhost:3847/send-to-openclaw`
-   - **Auth token**: your `WEBHOOK_TOKEN` if you set one
-
-### 4. Run the server as a service (optional)
-
-**macOS (launchd):**
-```bash
-# Edit paths in the plist first
-cp server/com.sendtoopenclaw.plist ~/Library/LaunchAgents/
-launchctl load ~/Library/LaunchAgents/com.sendtoopenclaw.plist
-```
-
-**Linux (systemd):**
-```bash
-# Edit paths in the service file first
-sudo cp server/send-to-openclaw.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now send-to-openclaw
-```
+The extension comes pre-configured with the Polaris webhook URL.
 
 ## Usage
 
-- **Click the toolbar icon** → optionally add a message → hit **Send**
-- **Right-click** any page or selection → **Send to OpenClaw**
-- **Keyboard shortcut**: `Alt+Shift+S` captures selection and opens the popup
+- **Click the toolbar icon** to send current page
+- **Right-click** any page or selection → **Send to Polaris**
+- **Keyboard shortcut**: `Alt+Shift+S`
+- Select text first to send just the selection
+- Add an optional message/instructions before sending
 
-### Google Docs
+## Features
 
-Just open a Google Doc and click Send. The extension detects `docs.google.com/document/` URLs and fetches the doc as plain text using your browser session — no Google API credentials or OAuth needed. Works with private docs you have access to.
+- Extracts readable content from any page
+- Special handling for Twitter/X threads
+- Google Docs export support (uses your browser session)
+- Optional message/context with each send
+- Clean content extraction (removes ads, nav, etc.)
 
-## What your Clawdbot receives
+## What Polaris Receives
 
 ```
 📎 Page sent from browser: Document Title
@@ -82,14 +40,8 @@ Time: 2026-01-30T21:00:05.560Z
 Your optional message here
 
 ---
-The page content or Google Doc text...
+The page content or selected text...
 ```
-
-## Requirements
-
-- [Clawdbot](https://github.com/clawdbot/clawdbot) installed and running
-- Node.js 18+
-- Chrome or Chromium-based browser
 
 ## License
 

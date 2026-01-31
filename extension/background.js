@@ -8,9 +8,9 @@ function getSettings() {
   return new Promise((resolve) => {
     chrome.storage.sync.get(["webhookUrl", "authToken", "displayName"], (data) => {
       resolve({
-        webhookUrl: data.webhookUrl || "",
+        webhookUrl: data.webhookUrl || "https://polariss-mac-mini-1:4100/webhook/openclaw",
         authToken: data.authToken || "",
-        displayName: data.displayName || "OpenClaw"
+        displayName: data.displayName || "Polaris"
       });
     });
   });
@@ -192,7 +192,7 @@ async function sendPayload(tabId, tabUrl, tabTitle, selectionOverride) {
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.sync.get(["displayName"], (data) => {
-    const name = data.displayName || "OpenClaw";
+    const name = data.displayName || "Polaris";
     chrome.contextMenus.create({
       id: MENU_ID,
       title: `Send to ${name}`,
@@ -203,7 +203,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === "sync" && changes.displayName) {
-    const name = changes.displayName.newValue || "OpenClaw";
+    const name = changes.displayName.newValue || "Polaris";
     chrome.contextMenus.update(MENU_ID, { title: `Send to ${name}` });
   }
 });

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Send to OpenClaw Options</title>
+    <title>Send to Polaris Options</title>
     <link rel="stylesheet" href="options.css" />
   </head>
   <body>
@@ -11,19 +11,19 @@
       <div class="header-row">
         <img src="icons/icon48.png" alt="" class="header-icon" />
         <div>
-          <h1 id="options-title">Send to OpenClaw</h1>
-          <p class="subtitle">Configure where the extension sends content.</p>
+          <h1 id="options-title">Send to Polaris</h1>
+          <p class="subtitle">Configure where the extension sends page content.</p>
         </div>
       </div>
 
       <label for="displayName">Display Name</label>
-      <input id="displayName" type="text" placeholder="OpenClaw" />
+      <input id="displayName" type="text" placeholder="Polaris" />
 
       <label for="webhookUrl">Webhook URL</label>
-      <input id="webhookUrl" type="url" placeholder="http://localhost:3847/send-to-openclaw" />
+      <input id="webhookUrl" type="url" placeholder="https://polariss-mac-mini-1:4100/webhook/openclaw" />
 
-      <label for="authToken">Auth token (optional)</label>
-      <input id="authToken" type="password" placeholder="Bearer token" />
+      <label for="authToken">Auth token</label>
+      <input id="authToken" type="password" placeholder="cc_..." />
 
       <div class="actions">
         <button id="save">Save</button>

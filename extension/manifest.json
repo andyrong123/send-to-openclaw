@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Send to OpenClaw",
-  "version": "1.1.0",
-  "description": "Send readable page content to a OpenClaw webhook.",
+  "name": "Send to Polaris",
+  "version": "1.0.0",
+  "description": "Send page content to Polaris AI assistant.",
   "permissions": ["activeTab", "storage", "contextMenus", "scripting"],
   "host_permissions": ["https://docs.google.com/*"],
   "commands": {
@@ -11,11 +11,11 @@
         "default": "Alt+Shift+S",
         "mac": "Alt+Shift+S"
       },
-      "description": "Capture selection and open Send to OpenClaw"
+      "description": "Capture selection and send to Polaris"
     }
   },
   "action": {
-    "default_title": "Send to OpenClaw",
+    "default_title": "Send to Polaris",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
