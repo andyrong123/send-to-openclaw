@@ -10,7 +10,7 @@ function setStatus(message) {
 
 function loadSettings() {
   chrome.storage.sync.get(["webhookUrl", "authToken", "displayName"], (data) => {
-    webhookInput.value = data.webhookUrl || "https://polariss-mac-mini-1:4100/webhook/openclaw";
+    webhookInput.value = data.webhookUrl || "http://polariss-mac-mini-1:4100/webhook/openclaw";
     tokenInput.value = data.authToken || "";
     displayNameInput.value = data.displayName || "Polaris";
 

@@ -12,7 +12,7 @@ function getSettings() {
   return new Promise((resolve) => {
     chrome.storage.sync.get(["webhookUrl", "authToken", "displayName"], (data) => {
       resolve({
-        webhookUrl: data.webhookUrl || "https://polariss-mac-mini-1:4100/webhook/openclaw",
+        webhookUrl: data.webhookUrl || "http://polariss-mac-mini-1:4100/webhook/openclaw",
         authToken: data.authToken || "",
         displayName: data.displayName || "Polaris"
       });
